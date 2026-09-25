@@ -233,6 +233,27 @@ class SoundEffects {
       osc.stop(this.ctx.currentTime + 0.12);
     } catch (e) {}
   }
+
+  playKawaiiSparkle() {
+    try {
+      this.init();
+      if (!this.ctx) return;
+      const notes = [587.33, 739.99, 880.00, 1174.66]; // D5, F#5, A5, D6
+      notes.forEach((freq, idx) => {
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = "sine";
+        const startTime = this.ctx.currentTime + idx * 0.045;
+        osc.frequency.setValueAtTime(freq, startTime);
+        gain.gain.setValueAtTime(0.06, startTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, startTime + 0.22);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(startTime);
+        osc.stop(startTime + 0.22);
+      });
+    } catch (e) {}
+  }
 }
 
 const sounds = new SoundEffects();
@@ -290,10 +311,11 @@ document.addEventListener("DOMContentLoaded", () => {
   setupContextMenu();
   setupKeyboardShortcuts();
   initAboutMe();
+  setupAestheticStickers();
 
   // Show a welcome toast on first launch
   setTimeout(() => {
-    showToast("Escritorio Mac con Windows XP Bliss", "Pasa el mouse sobre las carpetas o haz clic para ver tus proyectos.");
+    showToast("Página personal", "Pasa el mouse sobre las carpetas o haz clic para ver mis proyectos.");
   }, 900);
 });
 
@@ -603,6 +625,77 @@ window.setFolderPhotos = function(folderId, photoUrls) {
 function resetFolderPositions() {
   initRandomFolderPositions(true);
   showToast("🎲 Posiciones aleatorias", "Carpetas esparcidas en posiciones aleatorias por la pantalla.");
+}
+
+// ==========================================================================
+// Aesthetic Kawaii Stickers: Interactive Glitter Silhouette & Particle Sparks
+// ==========================================================================
+function setupAestheticStickers() {
+  const stickers = document.querySelectorAll(".aesthetic-sticker");
+  if (!stickers.length) return;
+
+  const sparklesChars = ["✨", "⭐", "💖", "🌸", "✧", "⋆", "✦"];
+
+  stickers.forEach(sticker => {
+    function spawnGlitter(x, y) {
+      const p = document.createElement("div");
+      p.className = "glitter-particle";
+      p.textContent = sparklesChars[Math.floor(Math.random() * sparklesChars.length)];
+      
+      const offsetX = (Math.random() - 0.5) * 80;
+      const offsetY = (Math.random() - 0.5) * 80;
+      
+      p.style.left = `${x + offsetX}px`;
+      p.style.top = `${y + offsetY}px`;
+      p.style.fontSize = `${13 + Math.random() * 11}px`;
+      
+      desktopArea.appendChild(p);
+      setTimeout(() => p.remove(), 1200);
+    }
+
+    sticker.addEventListener("mouseenter", () => {
+      sounds.playKawaiiSparkle();
+      const rect = sticker.getBoundingClientRect();
+      const deskRect = desktopArea.getBoundingClientRect();
+      const cx = (rect.left - deskRect.left) + rect.width / 2;
+      const cy = (rect.top - deskRect.top) + rect.height / 2;
+      for (let i = 0; i < 5; i++) {
+        setTimeout(() => spawnGlitter(cx, cy), i * 140);
+      }
+    });
+
+    sticker.addEventListener("click", () => {
+      sounds.playKawaiiSparkle();
+      const rect = sticker.getBoundingClientRect();
+      const deskRect = desktopArea.getBoundingClientRect();
+      const cx = (rect.left - deskRect.left) + rect.width / 2;
+      const cy = (rect.top - deskRect.top) + rect.height / 2;
+
+      // Burst of sparkles
+      for (let i = 0; i < 10; i++) {
+        spawnGlitter(cx, cy);
+      }
+
+      // Cute squash and stretch bounce
+      sticker.animate([
+        { transform: "scale(1) translateY(0)" },
+        { transform: "scale(1.22, 0.85) translateY(4px)" },
+        { transform: "scale(0.92, 1.15) translateY(-14px)" },
+        { transform: "scale(1.06, 0.96) translateY(-4px)" },
+        { transform: "scale(1) translateY(0)" }
+      ], {
+        duration: 550,
+        easing: "cubic-bezier(0.34, 1.56, 0.64, 1)"
+      });
+    });
+
+    sticker.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        sticker.click();
+      }
+    });
+  });
 }
 
 // ==========================================================================

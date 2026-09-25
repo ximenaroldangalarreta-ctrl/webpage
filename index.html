@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,500;1,600;1,700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=3">
   <link rel="icon" type="image/png" href="assets/seal_clean.png">
 </head>
 <body>
@@ -46,6 +46,29 @@
     <!-- Desktop Workspace Canvas / Interactive Area -->
     <!-- Desktop Workspace Canvas / Interactive Area -->
     <main class="desktop-content" id="desktopArea">
+
+      <!-- Aesthetic Kawaii Stickers (with Silhouette Glitter Glow on Hover) -->
+      <div class="desktop-stickers-layer" id="stickersLayer">
+        <!-- 1. Mint LPS Seal -->
+        <div class="aesthetic-sticker sticker-seal" id="stickerSeal" title="Foquita Menta ✨" tabindex="0">
+          <img src="assets/sticker_seal.png" alt="Foquita Menta Kawaii" class="sticker-img">
+        </div>
+
+        <!-- 2. Pink Jellyfish -->
+        <div class="aesthetic-sticker sticker-jellyfish" id="stickerJellyfish" title="Medusa Rosada ✨" tabindex="0">
+          <img src="assets/sticker_jellyfish.png" alt="Medusa Rosada Kawaii" class="sticker-img">
+        </div>
+
+        <!-- 3. Programmer Character with Laptop -->
+        <div class="aesthetic-sticker sticker-laptop" id="stickerLaptop" title="Compañero Programador ✨" tabindex="0">
+          <img src="assets/sticker_laptop.png" alt="Personaje con Laptop Kawaii" class="sticker-img">
+        </div>
+
+        <!-- 4. Three Glitter Resin Stars -->
+        <div class="aesthetic-sticker sticker-stars" id="stickerStars" title="Estrellas de Resina Glitter ✨" tabindex="0">
+          <img src="assets/sticker_stars.png" alt="Estrellas de Resina Kawaii" class="sticker-img">
+        </div>
+      </div>
 
       <!-- Desktop Folders Group (4 Folders positioned according to user mockup) -->
       <div class="desktop-folders-scatter" id="foldersContainer">
@@ -417,70 +440,8 @@
           </div>
         </div>
 
-        <!-- Window Body: Sidebar + Main Content -->
+        <!-- Window Body: Main Content (Full Width) -->
         <div class="window-body">
-          <!-- Sidebar -->
-          <aside class="window-sidebar">
-            <div class="sidebar-section">
-              <div class="sidebar-heading">Favoritos</div>
-              <ul class="sidebar-list">
-                <li class="sidebar-item" data-folder="all">
-                  <span class="sidebar-item-icon">🗂️</span>
-                  <span>Todos los Proyectos</span>
-                  <span class="badge" id="badgeAll">10</span>
-                </li>
-                <li class="sidebar-item" data-folder="ideas">
-                  <span class="sidebar-item-icon">💡</span>
-                  <span>Ideas</span>
-                  <span class="badge" id="badgeIdeas">4</span>
-                </li>
-                <li class="sidebar-item" data-folder="progress">
-                  <span class="sidebar-item-icon">⏳</span>
-                  <span>En proceso</span>
-                  <span class="badge" id="badgeProgress">3</span>
-                </li>
-                <li class="sidebar-item" data-folder="completed">
-                  <span class="sidebar-item-icon">✅</span>
-                  <span>Finalizados</span>
-                  <span class="badge" id="badgeCompleted">3</span>
-                </li>
-                <li class="sidebar-item" data-folder="inspiration">
-                  <span class="sidebar-item-icon">✨</span>
-                  <span>Inspiración</span>
-                  <span class="badge" id="badgeInspiration">3</span>
-                </li>
-              </ul>
-            </div>
-
-            <div class="sidebar-section">
-              <div class="sidebar-heading">Etiquetas Rápidas</div>
-              <ul class="sidebar-list tags-list">
-                <li class="tag-item" data-filter-tag="Frontend">
-                  <span class="tag-dot dot-blue"></span> Frontend
-                </li>
-                <li class="tag-item" data-filter-tag="Backend">
-                  <span class="tag-dot dot-purple"></span> Backend
-                </li>
-                <li class="tag-item" data-filter-tag="Diseño">
-                  <span class="tag-dot dot-orange"></span> Diseño UI
-                </li>
-                <li class="tag-item" data-filter-tag="Mobile">
-                  <span class="tag-dot dot-green"></span> Mobile
-                </li>
-              </ul>
-            </div>
-
-            <div class="sidebar-footer">
-              <div class="disk-usage">
-                <span class="disk-label">Almacenamiento Local</span>
-                <div class="progress-bar-tiny">
-                  <div class="progress-bar-fill" style="width: 32%;"></div>
-                </div>
-                <span class="disk-caption">Sincronizado en navegador</span>
-              </div>
-            </div>
-          </aside>
-
           <!-- Main Projects Area -->
           <div class="window-main-content">
             <!-- Header inside Content -->
@@ -636,6 +597,6 @@
 
   </div>
 
-  <script src="script.js"></script>
+  <script src="script.js?v=3"></script>
 </body>
 </html>
