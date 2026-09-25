@@ -299,7 +299,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 // Load projects from localStorage or default
 function loadProjects() {
-  const saved = localStorage.getItem("mac_xp_projects_v2");
+  const saved = localStorage.getItem("mac_xp_projects_v3");
   if (saved) {
     try {
       projects = JSON.parse(saved);
@@ -314,7 +314,7 @@ function loadProjects() {
 }
 
 function saveProjects() {
-  localStorage.setItem("mac_xp_projects_v2", JSON.stringify(projects));
+  localStorage.setItem("mac_xp_projects_v3", JSON.stringify(projects));
   updateFolderCounters();
 }
 
@@ -376,11 +376,18 @@ function initClock() {
 // Random Scattered Folder Positioning & Drag & Drop Physics
 // ==========================================================================
 
+const MOCKUP_DEFAULT_RATIOS = {
+  "folder-ideas": { rx: 0.118, ry: 0.259 },
+  "folder-completed": { rx: 0.503, ry: 0.167 },
+  "folder-progress": { rx: 0.328, ry: 0.460 },
+  "folder-inspiration": { rx: 0.834, ry: 0.516 }
+};
+
 function initRandomFolderPositions(forceRandom = false) {
   const folders = document.querySelectorAll(".tucked-folder");
   if (!folders.length) return;
 
-  const savedPos = localStorage.getItem("mac_folder_positions");
+  const savedPos = localStorage.getItem("mac_folder_positions_v3");
   let positions = {};
 
   if (savedPos && !forceRandom) {
@@ -395,10 +402,10 @@ function initRandomFolderPositions(forceRandom = false) {
   const deskWidth = window.innerWidth || document.documentElement.clientWidth || 1200;
   const deskHeight = window.innerHeight || document.documentElement.clientHeight || 800;
 
-  const minX = 60;
+  const minX = 40;
   const maxX = Math.max(minX + 200, deskWidth - 180);
-  const minY = 60;
-  const maxY = Math.max(minY + 200, deskHeight - 200);
+  const minY = 50;
+  const maxY = Math.max(minY + 200, deskHeight - 190);
 
   const placedPositions = [];
 
@@ -412,6 +419,16 @@ function initRandomFolderPositions(forceRandom = false) {
       folder.style.left = `${x}px`;
       folder.style.top = `${y}px`;
       placedPositions.push({ x, y });
+    } else if (!forceRandom && MOCKUP_DEFAULT_RATIOS[id]) {
+      // Position exactly according to user's layout mockup
+      let x = Math.round(deskWidth * MOCKUP_DEFAULT_RATIOS[id].rx);
+      let y = Math.round(deskHeight * MOCKUP_DEFAULT_RATIOS[id].ry);
+      x = Math.min(maxX, Math.max(minX, x));
+      y = Math.min(maxY, Math.max(minY, y));
+      folder.style.left = `${x}px`;
+      folder.style.top = `${y}px`;
+      placedPositions.push({ x, y });
+      positions[id] = { x, y };
     } else {
       // Generate scattered random position with collision avoidance
       let attempts = 0;
@@ -450,7 +467,7 @@ function initRandomFolderPositions(forceRandom = false) {
     }, idx * 75);
   });
 
-  localStorage.setItem("mac_folder_positions", JSON.stringify(positions));
+  localStorage.setItem("mac_folder_positions_v3", JSON.stringify(positions));
 }
 
 function setupFolderInteractions() {
@@ -512,10 +529,10 @@ function setupFolderInteractions() {
           folder.style.top = `${finalY}px`;
 
           // Save position
-          const savedPos = localStorage.getItem("mac_folder_positions");
+          const savedPos = localStorage.getItem("mac_folder_positions_v3");
           let positions = savedPos ? JSON.parse(savedPos) : {};
           positions[folder.id] = { x: finalX, y: finalY };
-          localStorage.setItem("mac_folder_positions", JSON.stringify(positions));
+          localStorage.setItem("mac_folder_positions_v3", JSON.stringify(positions));
         } else {
           // Click to open Finder Modal
           const cat = folder.getAttribute("data-category") || "ideas";
@@ -621,10 +638,10 @@ function updateWindowMeta(category) {
       desc: "Conceptos, bocetos e iniciativas planificadas para comenzar."
     },
     progress: {
-      title: "En progreso — Proyectos Activos",
+      title: "En proceso — Proyectos Activos",
       icon: "⏳",
-      crumb: "En progreso",
-      header: "Proyectos En Progreso",
+      crumb: "En proceso",
+      header: "Proyectos En Proceso",
       desc: "Desarrollo activo, diseño y tareas en ejecución continua."
     },
     completed: {
@@ -633,6 +650,13 @@ function updateWindowMeta(category) {
       crumb: "Finalizados",
       header: "Proyectos Finalizados",
       desc: "Proyectos terminados con éxito, lanzados o archivados."
+    },
+    inspiration: {
+      title: "Inspiración — Moodboards & Referencias",
+      icon: "✨",
+      crumb: "Inspiración",
+      header: "Inspiración & Moodboards",
+      desc: "Colección visual, paletas retro, stickers aesthetic y referencias."
     },
     all: {
       title: "Todos los Proyectos — Vista General",
@@ -836,7 +860,8 @@ function renderProjects() {
     const categoryIcons = {
       ideas: "💡",
       progress: "⏳",
-      completed: "✅"
+      completed: "✅",
+      inspiration: "✨"
     };
     const folderIcon = categoryIcons[proj.category] || "📁";
 
@@ -884,8 +909,9 @@ function renderProjects() {
           <span>Mover:</span>
           <select class="change-status-select" data-id="${proj.id}">
             <option value="ideas" ${proj.category === 'ideas' ? 'selected' : ''}>💡 Ideas</option>
-            <option value="progress" ${proj.category === 'progress' ? 'selected' : ''}>⏳ En progreso</option>
+            <option value="progress" ${proj.category === 'progress' ? 'selected' : ''}>⏳ En proceso</option>
             <option value="completed" ${proj.category === 'completed' ? 'selected' : ''}>✅ Finalizados</option>
+            <option value="inspiration" ${proj.category === 'inspiration' ? 'selected' : ''}>✨ Inspiración</option>
           </select>
         </div>
 
@@ -939,7 +965,8 @@ function changeProjectCategory(id, newCat) {
   }
   saveProjects();
   renderProjects();
-  showToast("Proyecto movido", `"${p.title}" se movió a ${newCat === 'ideas' ? 'Ideas' : newCat === 'progress' ? 'En progreso' : 'Finalizados'}.`);
+  const catNames = { ideas: "Ideas", progress: "En proceso", completed: "Finalizados", inspiration: "Inspiración" };
+  showToast("Proyecto movido", `"${p.title}" se movió a ${catNames[newCat] || newCat}.`);
 }
 
 // Delete project
@@ -1301,10 +1328,11 @@ const DEFAULT_ABOUT_ME_TEXT = `¡Hola! Te doy la bienvenida a mi escritorio crea
 
 Soy Ximena, apasionada por la intersección entre el diseño visual, la tecnología y el desarrollo de experiencias interactivas.
 
-En este espacio encontrarás mis proyectos organizados en tres categorías:
+En este espacio encontrarás mis proyectos organizados en cuatro carpetas:
 • 💡 Ideas: Conceptos en planificación, terminales retro, pixel art, stickers y experimentos de hardware.
-• ⏳ En progreso: Iniciativas activas donde diseño y código se unen día a día.
+• ⏳ En proceso: Iniciativas activas donde diseño y código se unen día a día.
 • ✅ Finalizados: Proyectos completados con éxito y listos para compartir.
+• ✨ Inspiración: Moodboards, referencias visuales, paletas de color y estética digital retro.
 
 ¡Haz clic en "Editar mi presentación" arriba para personalizar este texto con tu propia introducción en cualquier momento! ✨`;
 
