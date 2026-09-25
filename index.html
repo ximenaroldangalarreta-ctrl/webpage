@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mac Desktop — Windows XP Edition</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,500;1,600;1,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" type="image/png" href="assets/seal_clean.png">
+</head>
+<body>
+  <!-- Desktop Container -->
+  <div id="desktop" class="desktop-screen">
+    <!-- Top macOS Menu Bar -->
+    <header class="mac-menubar" id="menubar">
+      <div class="menubar-left">
+        <div class="menu-item apple-menu personal-seal-item" id="appleMenuBtn" title="Ximena — Menú">
+          <img src="assets/seal_clean.png" alt="Sello Personal de Ximena" class="personal-seal-img">
+        </div>
+      </div>
+
+      <div class="menubar-right">
+        <div class="status-item datetime" id="clockDisplay">
+          vie 25 sept 11:10 AM
+        </div>
+      </div>
+    </header>
+
+    <!-- Apple Dropdown Menu -->
+    <div class="apple-dropdown-menu" id="appleDropdown">
+      <div class="menu-entry" onclick="openAboutModal()">Acerca de esta Mac</div>
+      <div class="menu-divider"></div>
+      <div class="menu-entry">Ajustes del Sistema...</div>
+      <div class="menu-entry">App Store...</div>
+      <div class="menu-divider"></div>
+      <div class="menu-entry">Ítems Recientes</div>
+      <div class="menu-divider"></div>
+      <div class="menu-entry">Forzar Salida...</div>
+      <div class="menu-divider"></div>
+      <div class="menu-entry">Bloquear Pantalla</div>
+      <div class="menu-entry">Cerrar Sesión de ximena...</div>
+    </div>
+
+    <!-- Desktop Workspace Canvas / Interactive Area -->
+    <!-- Desktop Workspace Canvas / Interactive Area -->
+    <main class="desktop-content" id="desktopArea">
+
+      <!-- Desktop Folders Group (4 Folders positioned according to user mockup) -->
+      <div class="desktop-folders-scatter" id="foldersContainer">
+        
+        <!-- Folder 1: Ideas (Color: #fffabf - Butter Yellow) -->
+        <div class="desktop-folder tucked-folder folder-yellow" id="folder-ideas" data-category="ideas" tabindex="0" role="button" aria-label="Carpeta Ideas">
+          <div class="folder-pocket-wrapper">
+            <!-- Back tab -->
+            <div class="folder-back-plate">
+              <div class="folder-tab"></div>
+            </div>
+
+            <!-- Tucked inside items (peek out from top) -->
+            <div class="tucked-items items-5">
+              <div class="tucked-item" title="Terminal Retro con Pantalla Globo">
+                <div class="polaroid-mini">
+                  <div class="polaroid-photo">
+                    <img src="assets/ideas/terminal.jpg" alt="Terminal Retro">
+                  </div>
+                </div>
+              </div>
+              <div class="tucked-item" title="Figma Design System">
+                <div class="polaroid-mini">
+                  <div class="polaroid-photo" style="background:#000;">
+                    <img src="assets/ideas/figma.svg" alt="Figma Icon">
+                  </div>
+                </div>
+              </div>
+              <div class="tucked-item" title="Kirby Pixel Art">
+                <div class="polaroid-mini">
+                  <div class="polaroid-photo">
+                    <img src="assets/ideas/kirby.jpg" alt="Kirby Pixel Art">
+                  </div>
+                </div>
+              </div>
+              <div class="tucked-item" title="ESP WiFi Analyzer">
+                <div class="polaroid-mini">
+                  <div class="polaroid-photo">
+                    <img src="assets/ideas/wifi_analyzer.jpg" alt="ESP WiFi Analyzer">
+                  </div>
+                </div>
+              </div>
+              <div class="tucked-item" title="Stickers LPS">
+                <div class="polaroid-mini">
+                  <div class="polaroid-photo">
+                    <img src="assets/ideas/stickers.jpg" alt="Stickers LPS">
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Front Pocket Flap -->
+            <div class="folder-front-pocket">
+              <span class="folder-badge-counter" id="count-ideas">5</span>
+            </div>
+          </div>
+          <span class="folder-label-aesthetic">Ideas</span>
+        </div>
+
+        <!-- Folder 2: Finalizados (Color: #f4adcf - Soft Rose) -->
+        <div class="desktop-folder tucked-folder folder-pink" id="folder-completed" data-category="completed" tabindex="0" role="button" aria-label="Carpeta Finalizados">
+          <div class="folder-pocket-wrapper">
+            <!-- Back tab -->
+            <div class="folder-back-plate">
+              <div class="folder-tab"></div>
+            </div>
+
+            <!-- Tucked inside items -->
+            <div class="tucked-items">
+              <div class="tucked-item item-left" title="Proyectos lanzados">
+                <div class="polaroid-mini">
+                  <div class="polaroid-photo bg-done">
+                    <span class="preview-emoji">🌟</span>
+                  </div>
+                </div>
+              </div>
+              <div class="tucked-item item-center" title="SaaS Lanzado">
+                <div class="polaroid-mini">
+                  <div class="polaroid-photo bg-trophy">
+                    <span class="preview-emoji">🚀</span>
+                  </div>
+                </div>
+              </div>
+              <div class="tucked-item item-right" title="Casos de éxito">
+                <div class="polaroid-mini">
+                  <div class="polaroid-photo bg-cert">
+                    <span class="preview-emoji">✨</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Front Pocket Flap -->
+            <div class="folder-front-pocket">
+              <span class="folder-badge-counter" id="count-completed">3</span>
+            </div>
+          </div>
+          <span class="folder-label-aesthetic">Finalizados</span>
+        </div>
+
+        <!-- Folder 3: En proceso (Color: #b2f9e7 - Mint Green) -->
+        <div class="desktop-folder tucked-folder folder-mint" id="folder-progress" data-category="progress" tabindex="0" role="button" aria-label="Carpeta En proceso">
+          <div class="folder-pocket-wrapper">
+            <!-- Back tab -->
+            <div class="folder-back-plate">
+              <div class="folder-tab"></div>
+            </div>
+
+            <!-- Tucked inside items -->
+            <div class="tucked-items">
+              <div class="tucked-item item-left" title="En desarrollo">
+                <div class="polaroid-mini">
+                  <div class="polaroid-photo bg-code">
+                    <span class="preview-tag">&lt;/&gt;</span>
+                  </div>
+                </div>
+              </div>
+              <div class="tucked-item item-center" title="Diseño UI">
+                <div class="polaroid-mini">
+                  <div class="polaroid-photo bg-ux">
+                    <span class="preview-tag">UI</span>
+                  </div>
+                </div>
+              </div>
+              <div class="tucked-item item-right" title="Métricas">
+                <div class="polaroid-mini">
+                  <div class="polaroid-photo bg-stats">
+                    <span class="preview-emoji">⏱️</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Front Pocket Flap -->
+            <div class="folder-front-pocket">
+              <span class="folder-badge-counter" id="count-progress">3</span>
+            </div>
+          </div>
+          <span class="folder-label-aesthetic">En proceso</span>
+        </div>
+
+        <!-- Folder 4: Inspiración (Color: #ffe7ff - Soft Lilac) -->
+        <div class="desktop-folder tucked-folder folder-lilac" id="folder-inspiration" data-category="inspiration" tabindex="0" role="button" aria-label="Carpeta Inspiración">
+          <div class="folder-pocket-wrapper">
+            <div class="folder-back-plate">
+              <div class="folder-tab"></div>
+            </div>
+
+            <div class="tucked-items">
+              <div class="tucked-item item-left" title="Paletas & Pixel Art">
+                <div class="polaroid-mini">
+                  <div class="polaroid-photo bg-art">
+                    <span class="preview-emoji">🎨</span>
+                  </div>
+                </div>
+              </div>
+              <div class="tucked-item item-center" title="Stickers & Moodboard">
+                <div class="polaroid-mini">
+                  <div class="polaroid-photo bg-music">
+                    <span class="preview-emoji">✨</span>
+                  </div>
+                </div>
+              </div>
+              <div class="tucked-item item-right" title="Diseño Y2K">
+                <div class="polaroid-mini">
+                  <div class="polaroid-photo bg-film">
+                    <span class="preview-emoji">🌸</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="folder-front-pocket">
+              <span class="folder-badge-counter" id="count-inspiration">3</span>
+            </div>
+          </div>
+          <span class="folder-label-aesthetic">Inspiración</span>
+        </div>
+
+      </div>
+
+      <!-- Marquee Drag Selection Box -->
+      <div id="selectionMarquee" class="selection-marquee"></div>
+
+      <!-- Quick Action Toast -->
+      <div id="macToast" class="mac-toast">
+        <div class="toast-icon">✨</div>
+        <div class="toast-content">
+          <div class="toast-title" id="toastTitle">Finder</div>
+          <div class="toast-msg" id="toastMsg">Haz clic en una carpeta para explorar tus proyectos</div>
+        </div>
+      </div>
+    </main>
+
+    <!-- macOS Dock at the bottom (Frosted Capsule Pill Dock with user photo & "Sobre mi" label) -->
+    <nav class="mac-dock-container">
+      <div class="mac-dock pill-dock" id="dock" onclick="openAboutMeModal()" role="button" tabindex="0" title="Haz clic para abrir Sobre mí">
+        <div class="dock-item" id="aboutMeDockBtn" aria-label="Sobre mí">
+          <div class="dock-icon about-me-dock-icon">
+            <img src="assets/about_me.png" alt="Sobre mí" class="dock-avatar-img">
+          </div>
+          <span class="dock-label">Sobre mi</span>
+        </div>
+      </div>
+    </nav>
+
+    <!-- "Sobre mí" macOS Window Modal -->
+    <div class="mac-window-overlay" id="aboutMeOverlay" style="display: none;">
+      <section class="mac-window about-me-window" id="aboutMeWindow" role="dialog" aria-modal="true" aria-labelledby="aboutMeTitle">
+        <!-- Window Title Bar -->
+        <header class="window-titlebar" id="aboutMeTitleBar">
+          <div class="window-controls">
+            <button class="control-btn close-btn" onclick="closeAboutMeModal()" title="Cerrar">
+              <svg viewBox="0 0 10 10" width="7" height="7">
+                <path d="M1 1 L9 9 M9 1 L1 9" stroke="#4c0000" stroke-width="1.6" stroke-linecap="round"/>
+              </svg>
+            </button>
+            <button class="control-btn minimize-btn" onclick="closeAboutMeModal()" title="Minimizar">
+              <svg viewBox="0 0 10 10" width="7" height="7">
+                <line x1="1" y1="5" x2="9" y2="5" stroke="#5c4300" stroke-width="1.8" stroke-linecap="round"/>
+              </svg>
+            </button>
+            <button class="control-btn maximize-btn" onclick="toggleMaximizeAboutMe()" title="Maximizar / Restaurar">
+              <svg viewBox="0 0 10 10" width="6" height="6">
+                <polygon points="1,9 9,1 9,9" fill="#004d00"/>
+              </svg>
+            </button>
+          </div>
+
+          <div class="window-title-group">
+            <img src="assets/about_me.png" alt="Icono Sobre mí" class="window-title-img">
+            <span class="window-title" id="aboutMeTitle">Sobre mí</span>
+          </div>
+
+          <div class="window-actions-right">
+            <button class="btn-mac-primary" id="btnEditBio" onclick="toggleEditBio()">
+              <span id="btnEditBioIcon">✏️</span> <span id="btnEditBioText">Editar mi presentación</span>
+            </button>
+          </div>
+        </header>
+
+        <!-- Window Body -->
+        <div class="about-me-body">
+          <div class="about-me-hero">
+            <div class="about-me-avatar-circle">
+              <img src="assets/about_me.png" alt="Ximena" class="about-me-avatar-img">
+            </div>
+            <div class="about-me-hero-text">
+              <h2 class="about-me-heading">¡Hola! Soy Ximena</h2>
+              <p class="about-me-subheading">Espacio Creativo • Diseño & Tecnología</p>
+            </div>
+          </div>
+
+          <!-- Display Mode -->
+          <div class="about-me-text-card" id="aboutMeTextDisplay">
+            <p id="aboutMeParagraph" class="about-me-p"></p>
+          </div>
+
+          <!-- Edit Mode (Hidden initially) -->
+          <div class="about-me-edit-card" id="aboutMeEditCard" style="display: none;">
+            <label for="aboutMeInput" class="about-me-input-label">Escribe tu texto de presentación:</label>
+            <textarea id="aboutMeInput" rows="7" placeholder="Escribe aquí tu introducción personal, qué proyectos realizas, tus gustos o tu filosofía de diseño..."></textarea>
+            <div class="about-me-edit-buttons">
+              <button class="btn-mac-secondary" onclick="cancelEditBio()">Cancelar</button>
+              <button class="btn-mac-primary" onclick="saveBioText()">Guardar Presentación</button>
+            </div>
+          </div>
+
+          <!-- Highlights / Skills / Interests -->
+          <div class="about-me-footer-tags">
+            <span class="about-me-tag">💡 Planificación</span>
+            <span class="about-me-tag">🎨 Diseño UI & Visual</span>
+            <span class="about-me-tag">✨ Proyectos Creativos</span>
+            <span class="about-me-tag">💻 Desarrollo</span>
+          </div>
+        </div>
+
+        <!-- Window Statusbar -->
+        <footer class="window-statusbar">
+          <span>Perfil Personal de Ximena</span>
+          <span class="status-sep">•</span>
+          <span id="aboutMeSaveStatus">Guardado localmente</span>
+          <span class="statusbar-spacer"></span>
+          <span>Ximena OS</span>
+        </footer>
+      </section>
+    </div>
+
+    <!-- Finder Modal Window (macOS Window) -->
+    <div class="mac-window-overlay" id="windowOverlay">
+      <section class="mac-window" id="finderWindow" role="dialog" aria-modal="true" aria-labelledby="windowTitle">
+        <!-- Window Title Bar -->
+        <header class="window-titlebar" id="windowTitleBar">
+          <div class="window-controls">
+            <button class="control-btn close-btn" id="closeBtn" title="Cerrar (Esc)">
+              <svg viewBox="0 0 10 10" width="7" height="7">
+                <path d="M1 1 L9 9 M9 1 L1 9" stroke="#4c0000" stroke-width="1.6" stroke-linecap="round"/>
+              </svg>
+            </button>
+            <button class="control-btn minimize-btn" id="minimizeBtn" title="Minimizar">
+              <svg viewBox="0 0 10 10" width="7" height="7">
+                <line x1="1" y1="5" x2="9" y2="5" stroke="#5c4300" stroke-width="1.8" stroke-linecap="round"/>
+              </svg>
+            </button>
+            <button class="control-btn maximize-btn" id="maximizeBtn" title="Maximizar / Restaurar">
+              <svg viewBox="0 0 10 10" width="6" height="6">
+                <polygon points="1,9 9,1 9,9" fill="#004d00"/>
+              </svg>
+            </button>
+          </div>
+
+          <div class="window-title-group">
+            <span class="window-icon" id="windowIcon">📁</span>
+            <span class="window-title" id="windowTitle">Ideas — Proyectos en Planificación</span>
+          </div>
+
+          <div class="window-actions-right">
+            <!-- Search within folder -->
+            <div class="window-search-box">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              <input type="text" id="projectSearchInput" placeholder="Buscar proyecto..." autocomplete="off">
+            </div>
+
+            <!-- New Project Button -->
+            <button class="btn-mac-primary" id="btnOpenNewProjectModal">
+              <span class="plus-icon">+</span> Nuevo Proyecto
+            </button>
+          </div>
+        </header>
+
+        <!-- Window Toolbar / Breadcrumbs & View Modes -->
+        <div class="window-toolbar">
+          <div class="toolbar-nav">
+            <button class="nav-arrow" title="Atrás" disabled>‹</button>
+            <button class="nav-arrow" title="Adelante" disabled>›</button>
+            <div class="breadcrumb-trail">
+              <span class="crumb">Macintosh HD</span>
+              <span class="crumb-sep">›</span>
+              <span class="crumb">Usuarios</span>
+              <span class="crumb-sep">›</span>
+              <span class="crumb">ximena</span>
+              <span class="crumb-sep">›</span>
+              <span class="crumb active" id="breadcrumbFolder">Ideas</span>
+            </div>
+          </div>
+
+          <div class="toolbar-controls">
+            <!-- Filter View Tabs -->
+            <div class="segmented-control" role="tablist">
+              <button class="segment-btn active" id="tabGrid" title="Vista de Cuadrícula">
+                <svg viewBox="0 0 16 16" width="13" height="13" fill="currentColor">
+                  <rect x="1" y="1" width="6" height="6" rx="1"/>
+                  <rect x="9" y="1" width="6" height="6" rx="1"/>
+                  <rect x="1" y="9" width="6" height="6" rx="1"/>
+                  <rect x="9" y="9" width="6" height="6" rx="1"/>
+                </svg>
+              </button>
+              <button class="segment-btn" id="tabList" title="Vista de Lista">
+                <svg viewBox="0 0 16 16" width="13" height="13" fill="currentColor">
+                  <rect x="1" y="2" width="14" height="2" rx="0.5"/>
+                  <rect x="1" y="7" width="14" height="2" rx="0.5"/>
+                  <rect x="1" y="12" width="14" height="2" rx="0.5"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Window Body: Sidebar + Main Content -->
+        <div class="window-body">
+          <!-- Sidebar -->
+          <aside class="window-sidebar">
+            <div class="sidebar-section">
+              <div class="sidebar-heading">Favoritos</div>
+              <ul class="sidebar-list">
+                <li class="sidebar-item" data-folder="all">
+                  <span class="sidebar-item-icon">🗂️</span>
+                  <span>Todos los Proyectos</span>
+                  <span class="badge" id="badgeAll">10</span>
+                </li>
+                <li class="sidebar-item" data-folder="ideas">
+                  <span class="sidebar-item-icon">💡</span>
+                  <span>Ideas</span>
+                  <span class="badge" id="badgeIdeas">4</span>
+                </li>
+                <li class="sidebar-item" data-folder="progress">
+                  <span class="sidebar-item-icon">⏳</span>
+                  <span>En proceso</span>
+                  <span class="badge" id="badgeProgress">3</span>
+                </li>
+                <li class="sidebar-item" data-folder="completed">
+                  <span class="sidebar-item-icon">✅</span>
+                  <span>Finalizados</span>
+                  <span class="badge" id="badgeCompleted">3</span>
+                </li>
+                <li class="sidebar-item" data-folder="inspiration">
+                  <span class="sidebar-item-icon">✨</span>
+                  <span>Inspiración</span>
+                  <span class="badge" id="badgeInspiration">3</span>
+                </li>
+              </ul>
+            </div>
+
+            <div class="sidebar-section">
+              <div class="sidebar-heading">Etiquetas Rápidas</div>
+              <ul class="sidebar-list tags-list">
+                <li class="tag-item" data-filter-tag="Frontend">
+                  <span class="tag-dot dot-blue"></span> Frontend
+                </li>
+                <li class="tag-item" data-filter-tag="Backend">
+                  <span class="tag-dot dot-purple"></span> Backend
+                </li>
+                <li class="tag-item" data-filter-tag="Diseño">
+                  <span class="tag-dot dot-orange"></span> Diseño UI
+                </li>
+                <li class="tag-item" data-filter-tag="Mobile">
+                  <span class="tag-dot dot-green"></span> Mobile
+                </li>
+              </ul>
+            </div>
+
+            <div class="sidebar-footer">
+              <div class="disk-usage">
+                <span class="disk-label">Almacenamiento Local</span>
+                <div class="progress-bar-tiny">
+                  <div class="progress-bar-fill" style="width: 32%;"></div>
+                </div>
+                <span class="disk-caption">Sincronizado en navegador</span>
+              </div>
+            </div>
+          </aside>
+
+          <!-- Main Projects Area -->
+          <div class="window-main-content">
+            <!-- Header inside Content -->
+            <div class="content-header">
+              <div>
+                <h2 class="category-heading" id="categoryTitle">Proyectos en Ideas</h2>
+                <p class="category-subtitle" id="categoryDesc">Conceptos, bocetos e iniciativas planificadas para comenzar.</p>
+              </div>
+
+              <!-- Quick Sort Dropdown -->
+              <div class="sort-selector">
+                <label for="sortProjects">Ordenar por:</label>
+                <select id="sortProjects" class="mac-select">
+                  <option value="recent">Más recientes</option>
+                  <option value="title">Nombre (A-Z)</option>
+                  <option value="progress">Progreso (%)</option>
+                  <option value="priority">Prioridad</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Projects Grid Container -->
+            <div class="projects-grid" id="projectsContainer">
+              <!-- Dynamically populated via script.js -->
+            </div>
+
+            <!-- Empty State (Shown when search/filter has no results) -->
+            <div class="empty-state" id="emptyState" style="display: none;">
+              <div class="empty-icon">📂</div>
+              <h3>No se encontraron proyectos</h3>
+              <p>No hay proyectos que coincidan con la búsqueda o el filtro actual.</p>
+              <button class="btn-mac-primary" onclick="resetFilters()">Restablecer Filtros</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Window Status Bar -->
+        <footer class="window-statusbar">
+          <span id="statusItemCount">4 ítems</span>
+          <span class="status-sep">•</span>
+          <span id="statusSelectionInfo">Haga clic en un proyecto para editar o mover de estado</span>
+          <span class="statusbar-spacer"></span>
+          <span>Mac OS X + Win XP Hybrid</span>
+        </footer>
+      </section>
+    </div>
+
+    <!-- Modal to Add / Edit Project -->
+    <div class="modal-dialog-overlay" id="projectFormModal">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h3 id="formModalTitle">Nuevo Proyecto</h3>
+          <button class="modal-close-icon" id="btnCloseProjectForm">✕</button>
+        </div>
+        <form id="projectForm" class="modal-form">
+          <input type="hidden" id="editProjectId" value="">
+          
+          <div class="form-group">
+            <label for="projTitle">Nombre del Proyecto *</label>
+            <input type="text" id="projTitle" placeholder="Ej: App de Control de Finanzas" required>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group half">
+              <label for="projCategory">Estado / Carpeta *</label>
+              <select id="projCategory" required>
+                <option value="ideas">💡 Ideas</option>
+                <option value="progress">⏳ En proceso</option>
+                <option value="completed">✅ Finalizados</option>
+                <option value="inspiration">✨ Inspiración</option>
+              </select>
+            </div>
+
+            <div class="form-group half">
+              <label for="projPriority">Prioridad</label>
+              <select id="projPriority">
+                <option value="Alta">🔴 Alta</option>
+                <option value="Media" selected>🟡 Media</option>
+                <option value="Baja">🟢 Baja</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="projDescription">Descripción</label>
+            <textarea id="projDescription" rows="3" placeholder="Describe el objetivo, alcance o funcionalidades clave del proyecto..."></textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group half">
+              <label for="projTags">Etiquetas (separadas por coma)</label>
+              <input type="text" id="projTags" placeholder="React, Node.js, UI/UX">
+            </div>
+
+            <div class="form-group half">
+              <label for="projProgress">Progreso actual: <span id="progressValDisplay">0%</span></label>
+              <input type="range" id="projProgress" min="0" max="100" value="0" oninput="document.getElementById('progressValDisplay').innerText = this.value + '%'">
+            </div>
+          </div>
+
+          <div class="modal-buttons">
+            <button type="button" class="btn-mac-secondary" id="btnCancelProjectForm">Cancelar</button>
+            <button type="submit" class="btn-mac-primary" id="btnSaveProject">Guardar Proyecto</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- About This Mac Modal -->
+    <div class="modal-dialog-overlay" id="aboutModal">
+      <div class="modal-card about-card">
+        <button class="modal-close-icon" onclick="closeAboutModal()">✕</button>
+        <div class="about-logo">
+          <img src="assets/seal_clean.png" alt="Sello Personal de Ximena" style="width: 76px; height: 76px; object-fit: contain; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.15));">
+        </div>
+        <h2>Ximena OS — Bliss XP Edition</h2>
+        <p class="about-version">Versión 14.5.1 (Build XP2026)</p>
+        <div class="about-specs">
+          <p><strong>Espacio Personal:</strong> Ximena Workspace</p>
+          <p><strong>Fondo de Pantalla:</strong> Windows XP "Bliss" (Colina de Sonoma)</p>
+          <p><strong>Carpetas activas:</strong> Ideas, En progreso, Finalizados</p>
+        </div>
+        <button class="btn-mac-primary" onclick="closeAboutModal()" style="margin-top: 15px;">Aceptar</button>
+      </div>
+    </div>
+
+    <!-- Spotlight Search Overlay -->
+    <div class="spotlight-overlay" id="spotlightOverlay">
+      <div class="spotlight-box">
+        <div class="spotlight-input-row">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#8e8e93" stroke-width="2.5">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input type="text" id="spotlightInput" placeholder="Spotlight: Busca en tus proyectos o carpetas...">
+          <kbd>ESC</kbd>
+        </div>
+        <div class="spotlight-results" id="spotlightResults"></div>
+      </div>
+    </div>
+
+    <!-- Desktop Context Menu (Right Click) -->
+    <div class="context-menu" id="contextMenu">
+      <div class="context-item" onclick="triggerNewProjectInActive()">+ Nuevo Proyecto</div>
+      <div class="context-divider"></div>
+      <div class="context-item" onclick="openFolderModal('ideas')">Abrir Carpeta "Ideas"</div>
+      <div class="context-item" onclick="openFolderModal('progress')">Abrir Carpeta "En progreso"</div>
+      <div class="context-item" onclick="openFolderModal('completed')">Abrir Carpeta "Finalizados"</div>
+      <div class="context-divider"></div>
+      <div class="context-item" onclick="resetFolderPositions()">🎲 Mezclar Posiciones (Aleatorias)</div>
+      <div class="context-item" onclick="openAboutModal()">Acerca de este Sistema</div>
+    </div>
+
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

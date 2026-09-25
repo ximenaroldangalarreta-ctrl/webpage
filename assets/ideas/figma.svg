@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="100%" height="100%">
+  <rect width="500" height="500" rx="110" fill="#000000"/>
+  <g transform="translate(150, 90) scale(5.0)">
+    <!-- Green teardrop (bottom-left) -->
+    <path fill="#0ACF83" d="M10 30 C10 35.523 14.477 40 20 40 C25.523 40 30 35.523 30 30 L30 20 L20 20 C14.477 20 10 24.477 10 30 Z" transform="translate(0, 20)"/>
+    <!-- Blue circle (middle-right) -->
+    <circle fill="#1ABCFE" cx="40" cy="30" r="10"/>
+    <!-- Purple left (middle-left) -->
+    <path fill="#A259FF" d="M10 30 C10 24.477 14.477 20 20 20 L30 20 L30 40 L20 40 C14.477 40 10 35.523 10 30 Z"/>
+    <!-- Orange top-left -->
+    <path fill="#F24E1E" d="M10 10 C10 4.477 14.477 0 20 0 L30 0 L30 20 L20 20 C14.477 20 10 15.523 10 10 Z"/>
+    <!-- Red top-right -->
+    <path fill="#FF7262" d="M30 0 L40 0 C45.523 0 50 4.477 50 10 C50 15.523 45.523 20 40 20 L30 20 Z"/>
+  </g>
+</svg>
