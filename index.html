@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,500;1,600;1,700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=3">
+  <link rel="stylesheet" href="style.css?v=6">
   <link rel="icon" type="image/png" href="assets/seal_clean.png">
 </head>
 <body>
@@ -304,7 +304,7 @@
           </div>
 
           <div class="window-actions-right">
-            <button class="btn-mac-primary" id="btnEditBio" onclick="toggleEditBio()">
+            <button class="btn-mac-primary owner-only" id="btnEditBio" onclick="toggleEditBio()">
               <span id="btnEditBioIcon">✏️</span> <span id="btnEditBioText">Editar mi presentación</span>
             </button>
           </div>
@@ -349,8 +349,8 @@
         <!-- Window Statusbar -->
         <footer class="window-statusbar">
           <span>Perfil Personal de Ximena</span>
-          <span class="status-sep">•</span>
-          <span id="aboutMeSaveStatus">Guardado localmente</span>
+          <span class="status-sep owner-only">•</span>
+          <span id="aboutMeSaveStatus" class="owner-only">Guardado localmente</span>
           <span class="statusbar-spacer"></span>
           <span>Ximena OS</span>
         </footer>
@@ -396,7 +396,7 @@
             </div>
 
             <!-- New Project Button -->
-            <button class="btn-mac-primary" id="btnOpenNewProjectModal">
+            <button class="btn-mac-primary owner-only" id="btnOpenNewProjectModal">
               <span class="plus-icon">+</span> Nuevo Proyecto
             </button>
           </div>
@@ -550,6 +550,24 @@
       </div>
     </div>
 
+    <!-- Project Detail Modal (read-only view for visitors) -->
+    <div class="modal-dialog-overlay" id="projectDetailModal">
+      <div class="modal-card project-detail-card" role="dialog" aria-modal="true" aria-labelledby="detailTitle">
+        <button class="modal-close-icon detail-close" id="btnCloseProjectDetail" aria-label="Cerrar">✕</button>
+        <div class="detail-cover" id="detailCover"></div>
+        <div class="detail-body">
+          <div class="detail-meta" id="detailMeta"></div>
+          <h3 class="detail-title" id="detailTitle"></h3>
+          <p class="detail-description" id="detailDescription"></p>
+          <div class="card-tags" id="detailTags"></div>
+          <div class="card-progress-section" id="detailProgress"></div>
+          <div class="detail-actions owner-only">
+            <button type="button" class="btn-mac-secondary" id="btnDetailEdit">✏️ Editar proyecto</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- About This Mac Modal -->
     <div class="modal-dialog-overlay" id="aboutModal">
       <div class="modal-card about-card">
@@ -562,7 +580,7 @@
         <div class="about-specs">
           <p><strong>Espacio Personal:</strong> Ximena Workspace</p>
           <p><strong>Fondo de Pantalla:</strong> Windows XP "Bliss" (Colina de Sonoma)</p>
-          <p><strong>Carpetas activas:</strong> Ideas, En progreso, Finalizados</p>
+          <p><strong>Carpetas activas:</strong> Ideas, En proceso, Finalizados, Inspiración</p>
         </div>
         <button class="btn-mac-primary" onclick="closeAboutModal()" style="margin-top: 15px;">Aceptar</button>
       </div>
@@ -585,11 +603,12 @@
 
     <!-- Desktop Context Menu (Right Click) -->
     <div class="context-menu" id="contextMenu">
-      <div class="context-item" onclick="triggerNewProjectInActive()">+ Nuevo Proyecto</div>
-      <div class="context-divider"></div>
+      <div class="context-item owner-only" onclick="triggerNewProjectInActive()">+ Nuevo Proyecto</div>
+      <div class="context-divider owner-only"></div>
       <div class="context-item" onclick="openFolderModal('ideas')">Abrir Carpeta "Ideas"</div>
-      <div class="context-item" onclick="openFolderModal('progress')">Abrir Carpeta "En progreso"</div>
+      <div class="context-item" onclick="openFolderModal('progress')">Abrir Carpeta "En proceso"</div>
       <div class="context-item" onclick="openFolderModal('completed')">Abrir Carpeta "Finalizados"</div>
+      <div class="context-item" onclick="openFolderModal('inspiration')">Abrir Carpeta "Inspiración"</div>
       <div class="context-divider"></div>
       <div class="context-item" onclick="resetFolderPositions()">🎲 Mezclar Posiciones (Aleatorias)</div>
       <div class="context-item" onclick="openAboutModal()">Acerca de este Sistema</div>
@@ -597,6 +616,6 @@
 
   </div>
 
-  <script src="script.js?v=3"></script>
+  <script src="script.js?v=6"></script>
 </body>
 </html>

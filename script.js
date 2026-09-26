@@ -167,6 +167,47 @@ let currentSearchQuery = "";
 let currentSort = "recent";
 let isListView = false;
 
+const CATEGORY_ICONS = {
+  ideas: "💡",
+  progress: "⏳",
+  completed: "✅",
+  inspiration: "✨"
+};
+
+const CATEGORY_NAMES = {
+  ideas: "Ideas",
+  progress: "En proceso",
+  completed: "Finalizados",
+  inspiration: "Inspiración"
+};
+
+// Below this width folders snap to a tidy grid instead of scattered positions
+const COMPACT_BREAKPOINT = 700;
+
+// Visitors get a read-only portfolio. Opening the page once with ?editar
+// unlocks editing on that browser; ?ver switches back to the visitor view.
+const OWNER_MODE_KEY = "ximena_owner_mode";
+let ownerMode = false;
+
+function initOwnerMode() {
+  const params = new URLSearchParams(window.location.search);
+  try {
+    if (params.has("editar")) localStorage.setItem(OWNER_MODE_KEY, "1");
+    if (params.has("ver")) localStorage.removeItem(OWNER_MODE_KEY);
+    ownerMode = localStorage.getItem(OWNER_MODE_KEY) === "1";
+  } catch (e) {
+    ownerMode = params.has("editar");
+  }
+  document.body.classList.toggle("owner-mode", ownerMode);
+
+  const hint = document.getElementById("statusSelectionInfo");
+  if (hint) {
+    hint.textContent = ownerMode
+      ? "Modo edición: crea, edita o mueve proyectos"
+      : "Haz clic en un proyecto para ver los detalles";
+  }
+}
+
 // Audio context for authentic synthesized macOS sound effects
 class SoundEffects {
   constructor() {
@@ -298,6 +339,7 @@ const aboutMeSaveStatus = document.getElementById("aboutMeSaveStatus");
 
 // Initialize on DOM load
 document.addEventListener("DOMContentLoaded", () => {
+  initOwnerMode();
   loadProjects();
   initClock();
   initRandomFolderPositions();
@@ -312,10 +354,20 @@ document.addEventListener("DOMContentLoaded", () => {
   setupKeyboardShortcuts();
   initAboutMe();
   setupAestheticStickers();
+  restoreFolderPhotos();
+  setupPixelWallpaper();
+  setupProjectDetail();
+  setupCompactLayoutWatcher();
 
   // Show a welcome toast on first launch
   setTimeout(() => {
-    showToast("Página personal", "Pasa el mouse sobre las carpetas o haz clic para ver mis proyectos.");
+    if (ownerMode) {
+      showToast("Modo edición", "Puedes crear y editar proyectos. Abre la página con ?ver para ver la vista de visitante.");
+    } else if (window.matchMedia("(hover: none)").matches) {
+      showToast("Página personal", "Toca una carpeta para ver mis proyectos.");
+    } else {
+      showToast("Página personal", "Pasa el mouse sobre las carpetas o haz clic para ver mis proyectos.");
+    }
   }, 900);
 });
 
@@ -328,11 +380,35 @@ function loadProjects() {
     } catch (e) {
       projects = [...DEFAULT_PROJECTS];
     }
+    mergeNewDefaultProjects();
   } else {
     projects = [...DEFAULT_PROJECTS];
+    markDefaultProjectsSeen();
     saveProjects();
   }
   updateFolderCounters();
+}
+
+// Add default projects shipped after the visitor's first load, without
+// bringing back defaults they already deleted.
+function mergeNewDefaultProjects() {
+  let seen = null;
+  try {
+    seen = JSON.parse(localStorage.getItem("mac_xp_seen_defaults"));
+  } catch (e) {}
+
+  if (Array.isArray(seen)) {
+    const fresh = DEFAULT_PROJECTS.filter(d => !seen.includes(d.id) && !projects.some(p => p.id === d.id));
+    if (fresh.length) {
+      projects.push(...fresh);
+      saveProjects();
+    }
+  }
+  markDefaultProjectsSeen();
+}
+
+function markDefaultProjectsSeen() {
+  localStorage.setItem("mac_xp_seen_defaults", JSON.stringify(DEFAULT_PROJECTS.map(d => d.id)));
 }
 
 function saveProjects() {
@@ -405,9 +481,62 @@ const MOCKUP_DEFAULT_RATIOS = {
   "folder-inspiration": { rx: 0.834, ry: 0.516 }
 };
 
+function isCompactLayout() {
+  return window.innerWidth < COMPACT_BREAKPOINT;
+}
+
+// Staggered pop-in shared by both layouts
+function revealFolder(folder, idx) {
+  folder.style.opacity = "0";
+  folder.style.transform = "scale(0.85) translateY(20px)";
+  setTimeout(() => {
+    folder.style.transition = "transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.35s ease";
+    folder.style.opacity = "1";
+    folder.style.transform = "scale(1) translateY(0)";
+  }, idx * 75);
+}
+
+// Phones: a 2x2 grid in folder order. Scattered desktop coordinates would pile
+// the folders on top of each other on a narrow screen.
+function layoutFoldersCompact(folders) {
+  const order = ["ideas", "progress", "completed", "inspiration"];
+  const sorted = Array.from(folders).sort((a, b) =>
+    order.indexOf(a.getAttribute("data-category")) - order.indexOf(b.getAttribute("data-category")));
+  const colWidth = window.innerWidth / 2;
+  const rowHeight = 170;
+
+  sorted.forEach((folder, idx) => {
+    const col = idx % 2;
+    const row = Math.floor(idx / 2);
+    folder.style.left = `${Math.round(colWidth * col + (colWidth - folder.offsetWidth) / 2)}px`;
+    folder.style.top = `${36 + row * rowHeight}px`;
+    revealFolder(folder, idx);
+  });
+}
+
+function setupCompactLayoutWatcher() {
+  let wasCompact = isCompactLayout();
+  let timer = null;
+  window.addEventListener("resize", () => {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      const compact = isCompactLayout();
+      if (compact !== wasCompact) {
+        wasCompact = compact;
+        initRandomFolderPositions();
+      }
+    }, 200);
+  });
+}
+
 function initRandomFolderPositions(forceRandom = false) {
   const folders = document.querySelectorAll(".tucked-folder");
   if (!folders.length) return;
+
+  if (isCompactLayout()) {
+    layoutFoldersCompact(folders);
+    return;
+  }
 
   const savedPos = localStorage.getItem("mac_folder_positions_v3");
   let positions = {};
@@ -479,14 +608,7 @@ function initRandomFolderPositions(forceRandom = false) {
       positions[id] = { x, y };
     }
 
-    // Gentle staggered reveal animation
-    folder.style.opacity = "0";
-    folder.style.transform = "scale(0.85) translateY(20px)";
-    setTimeout(() => {
-      folder.style.transition = "transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.35s ease";
-      folder.style.opacity = "1";
-      folder.style.transform = "scale(1) translateY(0)";
-    }, idx * 75);
+    revealFolder(folder, idx);
   });
 
   localStorage.setItem("mac_folder_positions_v3", JSON.stringify(positions));
@@ -503,18 +625,22 @@ function setupFolderInteractions() {
     let currentY = 0;
     let moved = false;
 
+    // Pointer events cover mouse, touch and pen; stop the browser from
+    // scrolling/zooming while a folder is being dragged on touch screens.
+    folder.style.touchAction = "none";
+
     // Drag and drop physics on desktop
-    folder.addEventListener("mousedown", (e) => {
-      if (e.button !== 0) return; // Only left click
+    folder.addEventListener("pointerdown", (e) => {
+      if (e.button !== 0) return; // Only left click / primary touch
       sounds.playPop();
       isDragging = true;
       moved = false;
       startX = e.clientX;
       startY = e.clientY;
 
-      const rect = folder.getBoundingClientRect();
-      currentX = rect.left;
-      currentY = rect.top;
+      // offsetLeft/Top ignore hover transforms, so the folder doesn't jump on grab
+      currentX = folder.offsetLeft;
+      currentY = folder.offsetTop;
 
       folders.forEach(f => f.classList.remove("selected"));
       folder.classList.add("selected");
@@ -536,8 +662,9 @@ function setupFolderInteractions() {
 
       function onMouseUp(ev) {
         isDragging = false;
-        window.removeEventListener("mousemove", onMouseMove);
-        window.removeEventListener("mouseup", onMouseUp);
+        window.removeEventListener("pointermove", onMouseMove);
+        window.removeEventListener("pointerup", onMouseUp);
+        window.removeEventListener("pointercancel", onMouseUp);
 
         if (moved) {
           folder.style.zIndex = "";
@@ -550,6 +677,9 @@ function setupFolderInteractions() {
           folder.style.left = `${finalX}px`;
           folder.style.top = `${finalY}px`;
 
+          // Only desktop positions are remembered; the phone grid is always recomputed
+          if (isCompactLayout()) return;
+
           // Save position
           const savedPos = localStorage.getItem("mac_folder_positions_v3");
           let positions = savedPos ? JSON.parse(savedPos) : {};
@@ -558,12 +688,13 @@ function setupFolderInteractions() {
         } else {
           // Click to open Finder Modal
           const cat = folder.getAttribute("data-category") || "ideas";
-          openFolderModal(cat);
+          if (ev.type !== "pointercancel") openFolderModal(cat);
         }
       }
 
-      window.addEventListener("mousemove", onMouseMove);
-      window.addEventListener("mouseup", onMouseUp);
+      window.addEventListener("pointermove", onMouseMove);
+      window.addEventListener("pointerup", onMouseUp);
+      window.addEventListener("pointercancel", onMouseUp);
     });
 
     // Keyboard accessibility
@@ -587,7 +718,7 @@ function setupFolderInteractions() {
     folder.addEventListener("drop", (e) => {
       e.preventDefault();
       folder.classList.remove("drag-hover");
-      if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      if (ownerMode && e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
         handleDroppedPhotos(folder, e.dataTransfer.files);
       }
     });
@@ -597,15 +728,72 @@ function setupFolderInteractions() {
 // Handle photos dropped directly onto a folder
 function handleDroppedPhotos(folder, files) {
   const photoSlots = folder.querySelectorAll(".polaroid-photo");
-  Array.from(files).slice(0, 3).forEach((file, index) => {
-    if (file.type.startsWith("image/") && photoSlots[index]) {
-      const reader = new FileReader();
-      reader.onload = (ev) => {
-        photoSlots[index].innerHTML = `<img src="${ev.target.result}" alt="Preview" style="width:100%;height:100%;object-fit:cover;">`;
-        showToast("Foto añadida", `Imagen colocada en vista previa de "${folder.querySelector('.folder-label-aesthetic').textContent}".`);
-      };
-      reader.readAsDataURL(file);
-    }
+  const label = folder.querySelector(".folder-label-aesthetic");
+  const folderName = label ? label.textContent : folder.id;
+  const images = Array.from(files).filter(file => file.type.startsWith("image/"));
+
+  images.slice(0, 3).forEach((file, index) => {
+    if (!photoSlots[index]) return;
+    const reader = new FileReader();
+    reader.onload = async (ev) => {
+      // Shrink before storing: full-size data URLs quickly exceed the localStorage quota
+      const thumb = await downscaleImage(ev.target.result, 320);
+      setPhotoSlot(photoSlots[index], thumb);
+      saveFolderPhoto(folder.id, index, thumb);
+      showToast("Foto añadida", `Imagen colocada en vista previa de "${folderName}".`);
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function setPhotoSlot(slot, url) {
+  slot.innerHTML = `<img src="${escapeHtml(url)}" alt="Vista previa" style="width:100%;height:100%;object-fit:cover;">`;
+}
+
+function downscaleImage(dataUrl, maxSize) {
+  return new Promise(resolve => {
+    const img = new Image();
+    img.onload = () => {
+      const scale = Math.min(1, maxSize / Math.max(img.width, img.height));
+      const canvas = document.createElement("canvas");
+      canvas.width = Math.max(1, Math.round(img.width * scale));
+      canvas.height = Math.max(1, Math.round(img.height * scale));
+      canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
+      resolve(canvas.toDataURL("image/jpeg", 0.82));
+    };
+    img.onerror = () => resolve(dataUrl);
+    img.src = dataUrl;
+  });
+}
+
+function loadFolderPhotos() {
+  try {
+    return JSON.parse(localStorage.getItem("mac_folder_photos_v1")) || {};
+  } catch (e) {
+    return {};
+  }
+}
+
+function saveFolderPhoto(folderId, index, url) {
+  const photos = loadFolderPhotos();
+  photos[folderId] = photos[folderId] || {};
+  photos[folderId][index] = url;
+  try {
+    localStorage.setItem("mac_folder_photos_v1", JSON.stringify(photos));
+  } catch (e) {
+    showToast("Sin espacio", "La foto se muestra, pero no se pudo guardar para la próxima visita.");
+  }
+}
+
+function restoreFolderPhotos() {
+  const photos = loadFolderPhotos();
+  Object.keys(photos).forEach(folderId => {
+    const folder = document.getElementById(folderId);
+    if (!folder) return;
+    const photoSlots = folder.querySelectorAll(".polaroid-photo");
+    Object.keys(photos[folderId]).forEach(index => {
+      if (photoSlots[index]) setPhotoSlot(photoSlots[index], photos[folderId][index]);
+    });
   });
 }
 
@@ -696,6 +884,174 @@ function setupAestheticStickers() {
       }
     });
   });
+}
+
+// ==========================================================================
+// Procedural Pixel-Art "Bliss" Wallpaper
+// Drawn at low resolution and scaled up with crisp pixels, so it fits any
+// screen size with no seams, stretching or blurry bands.
+// ==========================================================================
+const WALLPAPER_PIXEL = 6; // Screen pixels per art pixel
+const WALLPAPER_SEED = 20011025; // Fixed seed: same clouds on every visit
+
+const WALLPAPER_PALETTE = {
+  // Zenith -> horizon
+  sky: [[46, 92, 201], [58, 110, 219], [76, 132, 230], [99, 155, 239], [128, 180, 246], [163, 204, 250]],
+  // Shadowed underside -> sunlit top
+  cloud: [[176, 199, 240], [206, 222, 248], [232, 240, 253], [255, 255, 255]],
+  // Sunlit crest -> deep foreground
+  grass: [[184, 222, 92], [150, 204, 72], [118, 182, 58], [91, 155, 47], [68, 126, 37], [48, 96, 28]]
+};
+
+function setupPixelWallpaper() {
+  // Paint the whole screen (not just #desktopArea) so the translucent
+  // menubar blurs the same wallpaper that's under the folders.
+  const screen = document.getElementById("desktop") || desktopArea;
+  if (!screen) return;
+  let resizeTimer = null;
+
+  const paint = () => {
+    const width = screen.clientWidth || window.innerWidth;
+    const height = screen.clientHeight || window.innerHeight;
+    const art = renderBlissWallpaper(width, height);
+    if (!art) return;
+    screen.style.backgroundImage = `url(${art.url})`;
+    screen.style.backgroundSize = `${art.w * WALLPAPER_PIXEL}px ${art.h * WALLPAPER_PIXEL}px`;
+    screen.style.backgroundPosition = "top left";
+    screen.style.backgroundRepeat = "no-repeat";
+  };
+
+  // Deep grass fallback so a strip is never black while a repaint is pending
+  screen.style.backgroundColor = "rgb(48, 96, 28)";
+  paint();
+
+  // Watch the element itself: the viewport can settle after DOMContentLoaded
+  // without a window resize event, which left unpainted strips.
+  const schedulePaint = () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(paint, 150);
+  };
+  if (window.ResizeObserver) {
+    new ResizeObserver(schedulePaint).observe(screen);
+  } else {
+    window.addEventListener("resize", schedulePaint);
+  }
+}
+
+function renderBlissWallpaper(width, height) {
+  const w = Math.max(1, Math.ceil(width / WALLPAPER_PIXEL));
+  const h = Math.max(1, Math.ceil(height / WALLPAPER_PIXEL));
+  const canvas = document.createElement("canvas");
+  canvas.width = w;
+  canvas.height = h;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return null;
+
+  const img = ctx.createImageData(w, h);
+  const data = img.data;
+
+  // Seeded value noise + fractal layering for natural-looking clouds and grass
+  const hash = (x, y) => {
+    let n = (Math.imul(x, 374761393) + Math.imul(y, 668265263) + WALLPAPER_SEED) | 0;
+    n = Math.imul(n ^ (n >>> 13), 1274126177);
+    return ((n ^ (n >>> 16)) >>> 0) / 4294967296;
+  };
+  const smooth = t => t * t * (3 - 2 * t);
+  const noise = (x, y) => {
+    const xi = Math.floor(x);
+    const yi = Math.floor(y);
+    const xf = smooth(x - xi);
+    const yf = smooth(y - yi);
+    const a = hash(xi, yi);
+    const b = hash(xi + 1, yi);
+    const c = hash(xi, yi + 1);
+    const d = hash(xi + 1, yi + 1);
+    return a + (b - a) * xf + (c - a) * yf + (a - b - c + d) * xf * yf;
+  };
+  const fbm = (x, y) => {
+    let value = 0;
+    let amp = 0.5;
+    let freq = 1;
+    for (let o = 0; o < 4; o++) {
+      value += amp * noise(x * freq, y * freq);
+      freq *= 2;
+      amp *= 0.5;
+    }
+    return value / 0.9375;
+  };
+  const clamp01 = v => Math.min(1, Math.max(0, v));
+
+  // 4x4 ordered dithering gives the retro banding without hard seams
+  const BAYER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5];
+  const pick = (palette, t, x, y) => {
+    const threshold = (BAYER[(y & 3) * 4 + (x & 3)] + 0.5) / 16;
+    const idx = Math.floor(clamp01(t) * (palette.length - 1) + threshold);
+    return palette[Math.min(palette.length - 1, idx)];
+  };
+
+  // Rolling Bliss hill: tall crest on the left, gentle rise on the right
+  const hillTop = x => {
+    const u = x / w;
+    return h * (0.6
+      - 0.12 * Math.exp(-(((u - 0.3) / 0.28) ** 2))
+      - 0.05 * Math.exp(-(((u - 0.88) / 0.22) ** 2))
+      + 0.008 * Math.sin(u * 11));
+  };
+
+  for (let x = 0; x < w; x++) {
+    const top = hillTop(x);
+    const u = x / w;
+
+    for (let y = 0; y < h; y++) {
+      let color;
+
+      if (y >= top) {
+        // Grass: brighter at the crest and toward the sunlit left
+        const depth = (y - top) / Math.max(1, h - top);
+        const edgeGlow = y - top < 1.5 ? -0.25 : 0;
+        const sideShade = Math.max(0, u - 0.3) * 0.3;
+        const texture = (fbm(x / 5, y / 2.5) - 0.5) * 0.35;
+        color = pick(WALLPAPER_PALETTE.grass, depth * 0.85 + sideShade + texture + edgeGlow, x, y);
+      } else {
+        const skyT = y / Math.max(1, top);
+        // Clouds: stretched horizontally, more of them in the upper sky
+        const nx = x / 22 + 7.3;
+        const ny = y / 7;
+        const density = fbm(nx, ny) + 0.1 * (1 - skyT) - 0.04;
+        const cloudEdge = 0.6;
+
+        if (density > cloudEdge) {
+          // Sunlit from above: compare with the cloud density just below
+          const below = fbm(nx, (y + 1.5) / 7) + 0.1 * (1 - skyT) - 0.04;
+          const lit = clamp01((density - cloudEdge) / 0.16) + (density >= below ? 0.2 : -0.2);
+          color = pick(WALLPAPER_PALETTE.cloud, lit, x, y);
+        } else {
+          color = pick(WALLPAPER_PALETTE.sky, skyT, x, y);
+        }
+      }
+
+      const i = (y * w + x) * 4;
+      data[i] = color[0];
+      data[i + 1] = color[1];
+      data[i + 2] = color[2];
+      data[i + 3] = 255;
+    }
+  }
+
+  ctx.putImageData(img, 0, 0);
+
+  // Upscale here with smoothing off instead of CSS image-rendering, which
+  // would be inherited and pixelate the stickers and photos too.
+  const scale = WALLPAPER_PIXEL * Math.min(2, Math.ceil(window.devicePixelRatio || 1));
+  const big = document.createElement("canvas");
+  big.width = w * scale;
+  big.height = h * scale;
+  const bigCtx = big.getContext("2d");
+  if (!bigCtx) return null;
+  bigCtx.imageSmoothingEnabled = false;
+  bigCtx.drawImage(canvas, 0, 0, big.width, big.height);
+
+  return { url: big.toDataURL("image/png"), w, h };
 }
 
 // ==========================================================================
@@ -843,6 +1199,7 @@ function setupWindowControls() {
     tabList.classList.remove("active");
     projectsContainer.classList.remove("list-view");
     isListView = false;
+    renderProjects();
   });
 
   tabList.addEventListener("click", () => {
@@ -850,6 +1207,7 @@ function setupWindowControls() {
     tabGrid.classList.remove("active");
     projectsContainer.classList.add("list-view");
     isListView = true;
+    renderProjects();
   });
 }
 
@@ -904,7 +1262,7 @@ function renderProjects() {
     }
     // Tag filter
     if (currentTagFilter) {
-      const hasTag = p.tags.some(t => t.toLowerCase().includes(currentTagFilter.toLowerCase()));
+      const hasTag = (p.tags || []).some(t => t.toLowerCase() === currentTagFilter.toLowerCase());
       if (!hasTag) return false;
     }
     // Search query
@@ -942,21 +1300,18 @@ function renderProjects() {
   }
 
   emptyState.style.display = "none";
-  projectsContainer.style.display = isListView ? "flex" : "grid";
+  // Let the stylesheet pick grid vs. list (.list-view) layout
+  projectsContainer.style.display = "";
 
   // Build Project Cards
   filtered.forEach(proj => {
     const card = document.createElement("article");
     card.className = "project-card";
+    card.tabIndex = 0;
+    card.setAttribute("aria-label", `Ver detalles de ${proj.title}`);
 
     // Category folder icon
-    const categoryIcons = {
-      ideas: "💡",
-      progress: "⏳",
-      completed: "✅",
-      inspiration: "✨"
-    };
-    const folderIcon = categoryIcons[proj.category] || "📁";
+    const folderIcon = CATEGORY_ICONS[proj.category] || "📁";
 
     // Priority class
     const priorityClass = `priority-${proj.priority ? proj.priority.toLowerCase() : 'media'}`;
@@ -970,7 +1325,7 @@ function renderProjects() {
     card.innerHTML = `
       ${proj.image ? `
         <div class="card-cover-image">
-          <img src="${proj.image}" alt="${escapeHtml(proj.title)}" style="width:100%;height:135px;object-fit:cover;border-radius:8px;margin-bottom:6px;box-shadow:0 2px 6px rgba(0,0,0,0.1);background:#f9fafb;">
+          <img src="${escapeHtml(proj.image)}" alt="${escapeHtml(proj.title)}" loading="lazy" style="width:100%;height:135px;object-fit:cover;border-radius:8px;margin-bottom:6px;box-shadow:0 2px 6px rgba(0,0,0,0.1);background:#f9fafb;">
         </div>
       ` : ''}
       <div class="card-top-row">
@@ -997,7 +1352,7 @@ function renderProjects() {
         </div>
       </div>
 
-      <div class="card-footer">
+      <div class="card-footer owner-only">
         <div class="status-changer">
           <span>Mover:</span>
           <select class="change-status-select" data-id="${proj.id}">
@@ -1031,6 +1386,19 @@ function renderProjects() {
       deleteProject(proj.id);
     });
 
+    // Clicking anywhere except the edit controls opens the detail view
+    card.addEventListener("click", (e) => {
+      if (e.target.closest(".card-footer")) return;
+      openProjectDetail(proj.id);
+    });
+    card.addEventListener("keydown", (e) => {
+      if (e.target !== card) return;
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        openProjectDetail(proj.id);
+      }
+    });
+
     projectsContainer.appendChild(card);
   });
 }
@@ -1045,8 +1413,69 @@ function resetFilters() {
   renderProjects();
 }
 
+// ==========================================================================
+// Project Detail View
+// ==========================================================================
+const projectDetailModal = document.getElementById("projectDetailModal");
+let detailProjectId = null;
+
+function setupProjectDetail() {
+  if (!projectDetailModal) return;
+
+  document.getElementById("btnCloseProjectDetail").addEventListener("click", closeProjectDetail);
+  projectDetailModal.addEventListener("click", (e) => {
+    if (e.target === projectDetailModal) closeProjectDetail();
+  });
+  document.getElementById("btnDetailEdit").addEventListener("click", () => {
+    const id = detailProjectId;
+    closeProjectDetail();
+    openEditProjectModal(id);
+  });
+}
+
+function openProjectDetail(id) {
+  const p = projects.find(item => item.id === id);
+  if (!p || !projectDetailModal) return;
+  sounds.playWindowOpen();
+  detailProjectId = id;
+
+  const icon = CATEGORY_ICONS[p.category] || "📁";
+  const cover = document.getElementById("detailCover");
+  cover.className = p.image ? "detail-cover" : `detail-cover detail-cover-${p.category}`;
+  cover.innerHTML = p.image
+    ? `<img src="${escapeHtml(p.image)}" alt="${escapeHtml(p.title)}">`
+    : `<span class="detail-cover-icon">${icon}</span>`;
+
+  const priority = p.priority || "Media";
+  document.getElementById("detailMeta").innerHTML = `
+    <span>${icon} ${escapeHtml(CATEGORY_NAMES[p.category] || p.category)}</span>
+    <span class="priority-badge priority-${escapeHtml(priority.toLowerCase())}">Prioridad ${escapeHtml(priority)}</span>
+  `;
+  document.getElementById("detailTitle").textContent = p.title;
+  document.getElementById("detailDescription").textContent = p.description || "Sin descripción detallada.";
+  document.getElementById("detailTags").innerHTML =
+    (p.tags || []).map(t => `<span class="card-tag">#${escapeHtml(t)}</span>`).join("");
+  document.getElementById("detailProgress").innerHTML = `
+    <div class="progress-header">
+      <span>Progreso</span>
+      <span>${Number(p.progress) || 0}%</span>
+    </div>
+    <div class="progress-bar-track">
+      <div class="progress-bar-val progress-${escapeHtml(p.category)}" style="width: ${Number(p.progress) || 0}%;"></div>
+    </div>
+  `;
+
+  projectDetailModal.classList.add("open");
+  setTimeout(() => document.getElementById("btnCloseProjectDetail").focus(), 80);
+}
+
+function closeProjectDetail() {
+  if (projectDetailModal) projectDetailModal.classList.remove("open");
+}
+
 // Move project between categories
 function changeProjectCategory(id, newCat) {
+  if (!ownerMode) return;
   const p = projects.find(item => item.id === id);
   if (!p) return;
   sounds.playPop();
@@ -1058,12 +1487,12 @@ function changeProjectCategory(id, newCat) {
   }
   saveProjects();
   renderProjects();
-  const catNames = { ideas: "Ideas", progress: "En proceso", completed: "Finalizados", inspiration: "Inspiración" };
-  showToast("Proyecto movido", `"${p.title}" se movió a ${catNames[newCat] || newCat}.`);
+  showToast("Proyecto movido", `"${p.title}" se movió a ${CATEGORY_NAMES[newCat] || newCat}.`);
 }
 
 // Delete project
 function deleteProject(id) {
+  if (!ownerMode) return;
   const p = projects.find(item => item.id === id);
   if (!p) return;
   if (confirm(`¿Deseas mover "${p.title}" a la papelera?`)) {
@@ -1097,6 +1526,7 @@ function setupProjectForm() {
 }
 
 function openNewProjectModal() {
+  if (!ownerMode) return;
   formModalTitle.textContent = "Nuevo Proyecto";
   document.getElementById("editProjectId").value = "";
   document.getElementById("projTitle").value = "";
@@ -1112,6 +1542,7 @@ function openNewProjectModal() {
 }
 
 function openEditProjectModal(id) {
+  if (!ownerMode) return;
   const p = projects.find(item => item.id === id);
   if (!p) return;
 
@@ -1180,6 +1611,7 @@ function saveProjectFormData() {
 }
 
 function triggerNewProjectInActive() {
+  if (!ownerMode) return;
   openFolderModal(currentCategoryFilter || "ideas");
   openNewProjectModal();
 }
@@ -1199,7 +1631,7 @@ function setupMarqueeSelection() {
     if (e.button !== 0) return;
 
     // Deselect folders
-    document.querySelectorAll(".desktop-folder").forEach(f => f.classList.remove("selected"));
+    document.querySelectorAll(".tucked-folder").forEach(f => f.classList.remove("selected"));
 
     isSelecting = true;
     startX = e.clientX;
@@ -1228,7 +1660,7 @@ function setupMarqueeSelection() {
 
       // Select folders intersecting with marquee
       const mRect = marquee.getBoundingClientRect();
-      document.querySelectorAll(".desktop-folder").forEach(folder => {
+      document.querySelectorAll(".tucked-folder").forEach(folder => {
         const fRect = folder.getBoundingClientRect();
         const overlap = !(
           fRect.right < mRect.left ||
@@ -1291,10 +1723,10 @@ function setupSpotlight() {
 
     spotlightResults.innerHTML = matches.map(p => `
       <div class="spotlight-item" data-id="${p.id}" data-category="${p.category}">
-        <span style="font-size: 18px;">${p.category === 'ideas' ? '💡' : p.category === 'progress' ? '⏳' : '✅'}</span>
+        <span style="font-size: 18px;">${CATEGORY_ICONS[p.category] || '📁'}</span>
         <div style="flex:1;">
           <div style="font-weight: 600; font-size: 13px;">${escapeHtml(p.title)}</div>
-          <div style="font-size: 11px; color: #6b7280;">${escapeHtml(p.category.toUpperCase())} • Progreso: ${p.progress}%</div>
+          <div style="font-size: 11px; color: #6b7280;">${escapeHtml(CATEGORY_NAMES[p.category] || p.category)} • Progreso: ${p.progress}%</div>
         </div>
       </div>
     `).join("");
@@ -1304,6 +1736,7 @@ function setupSpotlight() {
         const cat = item.getAttribute("data-category");
         spotlightOverlay.classList.remove("open");
         openFolderModal(cat);
+        openProjectDetail(item.getAttribute("data-id"));
       });
     });
   });
@@ -1382,7 +1815,9 @@ function setupKeyboardShortcuts() {
   window.addEventListener("keydown", (e) => {
     // ESC closes modals and windows
     if (e.key === "Escape") {
-      if (aboutMeWindow && aboutMeWindow.classList.contains("open")) {
+      if (projectDetailModal && projectDetailModal.classList.contains("open")) {
+        closeProjectDetail();
+      } else if (aboutMeWindow && aboutMeWindow.classList.contains("open")) {
         closeAboutMeModal();
       } else if (projectFormModal.classList.contains("open")) {
         closeProjectFormModal();
@@ -1427,7 +1862,7 @@ En este espacio encontrarás mis proyectos organizados en cuatro carpetas:
 • ✅ Finalizados: Proyectos completados con éxito y listos para compartir.
 • ✨ Inspiración: Moodboards, referencias visuales, paletas de color y estética digital retro.
 
-¡Haz clic en "Editar mi presentación" arriba para personalizar este texto con tu propia introducción en cualquier momento! ✨`;
+¡Gracias por pasar! Abre cualquier carpeta para explorar. ✨`;
 
 function initAboutMe() {
   const savedBio = localStorage.getItem("ximena_about_me_text");
@@ -1473,6 +1908,7 @@ function toggleMaximizeAboutMe() {
 }
 
 function toggleEditBio() {
+  if (!ownerMode) return;
   const isEditing = aboutMeEditCard && aboutMeEditCard.style.display === "flex";
   if (isEditing) {
     cancelEditBio();
@@ -1489,6 +1925,7 @@ function toggleEditBio() {
 }
 
 function saveBioText() {
+  if (!ownerMode) return;
   const newBio = aboutMeInput.value.trim();
   if (!newBio) {
     showToast("Sobre mí", "Por favor ingresa un texto para tu presentación.");
