@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,500;1,600;1,700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=6">
+  <link rel="stylesheet" href="style.css?v=11">
   <link rel="icon" type="image/png" href="assets/seal_clean.png">
 </head>
 <body>
@@ -265,12 +265,112 @@
 
     <!-- macOS Dock at the bottom (Frosted Capsule Pill Dock with user photo & "Sobre mi" label) -->
     <nav class="mac-dock-container">
-      <div class="mac-dock pill-dock" id="dock" onclick="openAboutMeModal()" role="button" tabindex="0" title="Haz clic para abrir Sobre mí">
-        <div class="dock-item" id="aboutMeDockBtn" aria-label="Sobre mí">
+      <div class="mac-dock pill-dock" id="dock">
+        <!-- Sobre mí -->
+        <div class="dock-item" id="aboutMeDockBtn" aria-label="Sobre mí" onclick="openAboutMeModal()" role="button" tabindex="0" title="Sobre mí">
           <div class="dock-icon about-me-dock-icon">
             <img src="assets/about_me.png" alt="Sobre mí" class="dock-avatar-img">
           </div>
           <span class="dock-label">Sobre mi</span>
+        </div>
+
+        <!-- Photo Booth -->
+        <div class="dock-item" id="photoBoothDockBtn" aria-label="Photo Booth" onclick="openPhotoBoothWindow()" role="button" tabindex="0" title="Photo Booth">
+          <div class="dock-icon photobooth-dock-icon">
+            <svg viewBox="0 0 512 512" width="50" height="50" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="pb-bg" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#c8102e"/>
+                  <stop offset="100%" stop-color="#8b0000"/>
+                </linearGradient>
+                <linearGradient id="pb-curtain-l" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stop-color="#6b0010"/>
+                  <stop offset="100%" stop-color="#cc1226"/>
+                </linearGradient>
+                <linearGradient id="pb-curtain-r" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stop-color="#cc1226"/>
+                  <stop offset="100%" stop-color="#6b0010"/>
+                </linearGradient>
+                <linearGradient id="pb-floor" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#8b5a00"/>
+                  <stop offset="100%" stop-color="#5c3a00"/>
+                </linearGradient>
+                <clipPath id="pb-round">
+                  <rect width="512" height="512" rx="115" ry="115"/>
+                </clipPath>
+              </defs>
+
+              <!-- App background -->
+              <rect width="512" height="512" rx="115" ry="115" fill="url(#pb-bg)"/>
+
+              <g clip-path="url(#pb-round)">
+                <!-- Stage floor -->
+                <rect x="0" y="390" width="512" height="122" fill="url(#pb-floor)" opacity="0.7"/>
+
+                <!-- Back wall (dark) -->
+                <rect x="0" y="0" width="512" height="400" fill="#1a0005" opacity="0.45"/>
+
+                <!-- Left curtain folds -->
+                <path d="M0,0 C40,60 10,120 45,180 C20,240 50,300 30,390 L0,390 Z" fill="url(#pb-curtain-l)"/>
+                <path d="M45,0 C80,70 55,130 85,190 C60,255 90,310 70,390 L30,390 C50,310 20,255 45,190 C15,130 40,70 45,0 Z" fill="#a50f1f"/>
+                <path d="M85,0 C115,80 90,140 120,200 C95,265 125,320 105,390 L70,390 C90,320 60,265 85,200 C55,140 80,80 85,0 Z" fill="#c01525"/>
+                <path d="M125,0 C150,85 128,145 155,205 C132,268 160,322 140,390 L105,390 C125,322 95,268 120,205 C93,145 115,85 125,0 Z" fill="#9a0e1c"/>
+                <!-- Left valance -->
+                <path d="M0,0 Q30,40 60,20 Q90,0 120,30 Q150,60 180,35 L180,80 Q140,55 110,80 Q80,105 50,75 Q20,50 0,70 Z" fill="#7a000f"/>
+
+                <!-- Right curtain folds -->
+                <path d="M512,0 C472,60 502,120 467,180 C492,240 462,300 482,390 L512,390 Z" fill="url(#pb-curtain-r)"/>
+                <path d="M467,0 C432,70 457,130 427,190 C452,255 422,310 442,390 L482,390 C462,310 492,255 467,190 C497,130 472,70 467,0 Z" fill="#a50f1f"/>
+                <path d="M427,0 C397,80 422,140 392,200 C417,265 387,320 407,390 L442,390 C422,320 452,265 427,200 C457,140 432,80 427,0 Z" fill="#c01525"/>
+                <path d="M387,0 C362,85 384,145 357,205 C380,268 352,322 372,390 L407,390 C387,322 417,268 392,205 C419,145 397,85 387,0 Z" fill="#9a0e1c"/>
+                <!-- Right valance -->
+                <path d="M512,0 Q482,40 452,20 Q422,0 392,30 Q362,60 332,35 L332,80 Q372,55 402,80 Q432,105 462,75 Q492,50 512,70 Z" fill="#7a000f"/>
+
+                <!-- Stage opening (dark center) -->
+                <rect x="155" y="30" width="202" height="360" fill="#0d0005" rx="4"/>
+
+                <!-- Camera body -->
+                <rect x="176" y="175" width="160" height="110" rx="18" fill="#2a2a2a"/>
+                <rect x="176" y="175" width="160" height="110" rx="18" fill="none" stroke="#555" stroke-width="2"/>
+                <!-- Camera top bump -->
+                <rect x="210" y="160" width="92" height="22" rx="8" fill="#222"/>
+                <!-- Lens outer ring -->
+                <circle cx="256" cy="230" r="38" fill="#1a1a1a" stroke="#444" stroke-width="3"/>
+                <circle cx="256" cy="230" r="28" fill="#111" stroke="#333" stroke-width="2"/>
+                <circle cx="256" cy="230" r="18" fill="#0a0a0a"/>
+                <circle cx="256" cy="230" r="9" fill="#050505"/>
+                <!-- Lens glint -->
+                <circle cx="244" cy="218" r="5" fill="white" opacity="0.18"/>
+                <circle cx="248" cy="221" r="2" fill="white" opacity="0.30"/>
+                <!-- Flash -->
+                <circle cx="306" cy="183" r="6" fill="#ffeeaa" opacity="0.85"/>
+                <circle cx="306" cy="183" r="4" fill="white" opacity="0.6"/>
+                <!-- Shutter button -->
+                <circle cx="318" cy="175" r="7" fill="#555"/>
+                <circle cx="318" cy="175" r="4" fill="#333"/>
+              </g>
+            </svg>
+          </div>
+          <span class="dock-label">Photo Booth</span>
+        </div>
+        <!-- Música / Spotify -->
+        <div class="dock-item" id="musicDockBtn" aria-label="Música" onclick="openSpotifyWidget()" role="button" tabindex="0" title="Música">
+          <div class="dock-icon music-dock-icon">
+            <svg viewBox="0 0 48 48" width="50" height="50" xmlns="http://www.w3.org/2000/svg">
+              <rect width="48" height="48" rx="12" fill="#f4bcc6"/>
+              <!-- Vinyl record -->
+              <circle cx="24" cy="24" r="14" fill="#5a1a2a"/>
+              <circle cx="24" cy="24" r="10" fill="#8b3a4a" opacity="0.5"/>
+              <circle cx="24" cy="24" r="6"  fill="#3a0e1c"/>
+              <circle cx="24" cy="24" r="2.5" fill="#f4bcc6"/>
+              <!-- Shine lines on vinyl -->
+              <path d="M14 18 Q18 16 22 18" stroke="#f4bcc6" stroke-width="0.8" fill="none" opacity="0.4"/>
+              <path d="M13 23 Q17 21 20 23" stroke="#f4bcc6" stroke-width="0.8" fill="none" opacity="0.3"/>
+              <!-- Music note top right -->
+              <text x="30" y="16" font-size="10" fill="#5a1a2a" font-family="serif">♪</text>
+            </svg>
+          </div>
+          <span class="dock-label">Música</span>
         </div>
       </div>
     </nav>
@@ -601,6 +701,187 @@
       </div>
     </div>
 
+    <!-- =============================================
+         Photo Booth Window
+         ============================================= -->
+    <div class="photobooth-window pb-hidden" id="photoboothWindow">
+      <!-- Title Bar -->
+      <div class="photobooth-titlebar mac-titlebar" id="photoboothTitlebar">
+        <div class="mac-traffic-lights">
+          <button class="traffic-btn traffic-close" id="photoboothClose" title="Cerrar"></button>
+          <button class="traffic-btn traffic-minimize" id="photoboothMinimize" title="Minimizar"></button>
+          <button class="traffic-btn traffic-fullscreen" title="Maximizar"></button>
+        </div>
+        <span class="photobooth-title-text">Photo Booth</span>
+        <div class="photobooth-titlebar-spacer"></div>
+      </div>
+
+      <!-- Camera Viewer -->
+      <div class="photobooth-body">
+        <div class="photobooth-viewfinder" id="photoboothViewfinder">
+          <!-- Sony camera frame wrapper -->
+          <div class="pb-camera-frame-wrap">
+            <!-- Live video fills the LCD area -->
+            <video id="photoboothVideo" autoplay playsinline muted class="pb-video-in-frame"></video>
+            <!-- Sony camera image sits on top as a frame -->
+            <img src="assets/camera_frame.png" alt="Camera Frame" class="pb-camera-frame-img" draggable="false">
+            <!-- ✨ Floating colorful stars overlay -->
+            <div class="pb-stars-overlay" id="pbStarsOverlay"></div>
+          </div>
+          <canvas id="photoboothCanvas" style="display:none;"></canvas>
+          <!-- Flash overlay -->
+          <div class="photobooth-flash" id="photoboothFlash"></div>
+          <!-- No camera message -->
+          <div class="photobooth-nocam" id="photoboothNoCam">
+            <svg viewBox="0 0 80 60" width="80" fill="none">
+              <rect x="5" y="14" width="70" height="42" rx="6" fill="#2a2a2a"/>
+              <circle cx="40" cy="35" r="13" fill="#3a3a3a" stroke="#555" stroke-width="2"/>
+              <circle cx="40" cy="35" r="8" fill="#222"/>
+              <circle cx="40" cy="35" r="3" fill="#111"/>
+              <rect x="28" y="10" width="24" height="8" rx="3" fill="#2a2a2a"/>
+              <circle cx="64" cy="21" r="3" fill="#555"/>
+            </svg>
+            <p>Cámara no disponible</p>
+            <button class="pb-retry-btn" onclick="initPhotoBooth()">Reintentar</button>
+          </div>
+          <!-- Countdown -->
+          <div class="photobooth-countdown" id="photoboothCountdown"></div>
+        </div>
+
+        <!-- Film Strip (captured photos) -->
+        <div class="photobooth-strip" id="photoboothStrip"></div>
+
+        <!-- Bottom Controls -->
+        <div class="photobooth-controls">
+          <button class="pb-effect-btn" id="pbEffectBtn" title="Efectos" onclick="togglePBEffects()">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M12 1v3M12 20v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M1 12h3M20 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/>
+            </svg>
+          </button>
+          <!-- Shutter Button -->
+          <button class="pb-shutter-btn" id="pbShutterBtn" onclick="takePhotoBoothPhoto()">
+            <span class="pb-shutter-inner"></span>
+          </button>
+          <button class="pb-clear-btn" title="Limpiar tira" onclick="clearPBStrip()">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8">
+              <polyline points="3 6 5 6 21 6"/>
+              <path d="M19 6l-1 14H6L5 6"/>
+              <path d="M10 11v6M14 11v6"/>
+              <path d="M9 6V4h6v2"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Effects Panel -->
+        <div class="pb-effects-panel" id="pbEffectsPanel">
+          <button class="pb-effect-pill active" data-effect="none" onclick="applyPBEffect(this, 'none')">Normal</button>
+          <button class="pb-effect-pill" data-effect="grayscale(1)" onclick="applyPBEffect(this, 'grayscale(1)')">B&amp;W</button>
+          <button class="pb-effect-pill" data-effect="sepia(0.9)" onclick="applyPBEffect(this, 'sepia(0.9)')">Sepia</button>
+          <button class="pb-effect-pill" data-effect="invert(1)" onclick="applyPBEffect(this, 'invert(1)')">Negativo</button>
+          <button class="pb-effect-pill" data-effect="hue-rotate(180deg) saturate(2)" onclick="applyPBEffect(this, 'hue-rotate(180deg) saturate(2)')">Glitch</button>
+          <button class="pb-effect-pill" data-effect="contrast(1.4) saturate(1.8) brightness(1.05)" onclick="applyPBEffect(this, 'contrast(1.4) saturate(1.8) brightness(1.05)')">Vivid</button>
+          <button class="pb-effect-pill" data-effect="blur(3px) brightness(1.1)" onclick="applyPBEffect(this, 'blur(3px) brightness(1.1)')">Dreamy</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- =============================================
+         Spotify Music Widget
+         ============================================= -->
+    <div class="spotify-widget pb-hidden" id="spotifyWidget">
+      <!-- Title Bar -->
+      <div class="spotify-widget-titlebar" id="spotifyWidgetTitlebar">
+        <div class="mac-traffic-lights">
+          <button class="traffic-btn traffic-close" id="spotifyWidgetClose" title="Cerrar"></button>
+          <button class="traffic-btn traffic-minimize" id="spotifyWidgetMinimize" title="Minimizar"></button>
+          <button class="traffic-btn traffic-fullscreen" title="Maximizar"></button>
+        </div>
+        <span class="spotify-widget-title">Música</span>
+        <div class="spotify-titlebar-spacer"></div>
+      </div>
+
+      <div class="spotify-widget-body" id="spotifyWidgetBody">
+
+        <!-- ── Connect / Setup Screen ── -->
+        <div class="spotify-connect-screen" id="spotifyConnectScreen">
+          <div class="spotify-connect-logo">
+            <svg viewBox="0 0 24 24" width="44" height="44" fill="#1DB954"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
+          </div>
+          <p class="spotify-connect-title">Conecta tu Spotify</p>
+
+          <div class="spotify-setup-steps">
+            <div class="setup-step">
+              <span class="step-num">1</span>
+              <span>En terminal, dentro de la carpeta del proyecto:<br><code>python3 -m http.server 8080</code></span>
+            </div>
+            <div class="setup-step">
+              <span class="step-num">2</span>
+              <span>Abre <strong>http://localhost:8080</strong> en el navegador</span>
+            </div>
+            <div class="setup-step">
+              <span class="step-num">3</span>
+              <span>En <a href="https://developer.spotify.com/dashboard" target="_blank">developer.spotify.com</a> crea una app y agrega el Redirect URI:<br><code>http://localhost:8080/index.html</code></span>
+            </div>
+          </div>
+
+          <input type="text" id="spotifyClientId" class="spotify-client-id-input" placeholder="Pega tu Client ID aquí…" autocomplete="off">
+          <button class="spotify-connect-btn" onclick="connectSpotify()">Conectar con Spotify ♪</button>
+        </div>
+
+        <!-- ── Player Screen ── -->
+        <div class="spotify-player-screen" id="spotifyPlayerScreen" style="display:none;">
+
+          <!-- Album Art -->
+          <div class="spotify-album-wrap">
+            <img class="spotify-album-art" id="spotAlbumArt" src="" alt="Album Art" style="display:none;">
+            <div class="spotify-album-placeholder" id="spotAlbumPlaceholder">♪</div>
+          </div>
+
+          <!-- Track Info -->
+          <div class="spotify-track-info">
+            <div class="spotify-track-name marquee-wrap"><span id="spotTrackName">—</span></div>
+            <div class="spotify-artist-name" id="spotArtistName">—</div>
+          </div>
+
+          <!-- Progress -->
+          <div class="spotify-progress-section">
+            <span class="spotify-time" id="spotTimeCurrent">0:00</span>
+            <input type="range" class="spotify-progress-bar" id="spotProgressBar" min="0" max="100" value="0">
+            <span class="spotify-time" id="spotTimeRemaining">-0:00</span>
+          </div>
+
+          <!-- Controls -->
+          <div class="spotify-controls-row">
+            <button class="spot-ctrl" id="spotShuffleBtn" onclick="spotifyAction('shuffle')" title="Mezclar">
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"/></svg>
+            </button>
+            <button class="spot-ctrl" id="spotPrevBtn" onclick="spotifyAction('previous')" title="Anterior">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6 8.5 6V6z"/></svg>
+            </button>
+            <button class="spot-ctrl spot-main-ctrl" id="spotPlayPauseBtn" onclick="spotifyAction('playpause')" title="Play/Pause">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" id="spotPlayIcon"><polygon points="5,3 19,12 5,21"/></svg>
+            </button>
+            <button class="spot-ctrl" id="spotNextBtn" onclick="spotifyAction('next')" title="Siguiente">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zm2-8.14L11.03 12 8 14.14V9.86zM15.5 6v12h2V6h-2z"/></svg>
+            </button>
+            <button class="spot-ctrl" id="spotRepeatBtn" onclick="spotifyAction('repeat')" title="Repetir">
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/></svg>
+            </button>
+          </div>
+
+          <!-- Top Tracks List -->
+          <div class="spotify-top-section">
+            <div class="spotify-top-label">🎵 Mis top tracks · últimas 4 semanas</div>
+            <div class="spotify-top-list" id="spotTopList"></div>
+          </div>
+
+          <button class="spotify-disconnect-btn" onclick="disconnectSpotify()">Desconectar</button>
+        </div>
+
+      </div>
+    </div>
+
     <!-- Desktop Context Menu (Right Click) -->
     <div class="context-menu" id="contextMenu">
       <div class="context-item owner-only" onclick="triggerNewProjectInActive()">+ Nuevo Proyecto</div>
@@ -616,6 +897,6 @@
 
   </div>
 
-  <script src="script.js?v=6"></script>
+  <script src="script.js?v=7"></script>
 </body>
 </html>
